@@ -33,6 +33,7 @@
 - e2e 不再写死本机 VS Code 路径，改为优先读 `VSCODE_EXE`、否则按各平台常见安装位置查找。
 - 命令面板与快捷键不再限制 `scmProvider == git`，非 Git 窗口里也能触发并看到友好提示。
 - 新增 `git.ts` 单元测试：多仓库选择、首次提交无 HEAD、`repo.diff` 失败回落 CLI、虚拟工作区报错。
+- 扩展 `name` 由 `ai-commit-msg` 改为 `ai-commit-msg-generator`：Marketplace 上 `ai-commit-msg` 已被其他发布者占用（`vaibhava17.ai-commit-msg`），扩展 ID 相应为 `verying.ai-commit-msg-generator`。配置前缀 `aiCommit.*` 与命令 ID 不依赖扩展名，未做改动。
 
 ## 0.0.5
 

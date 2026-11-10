@@ -13,7 +13,7 @@
 ### 从 vsix 安装
 
 ```bash
-code --install-extension ai-commit-msg-0.1.0.vsix --force
+code --install-extension ai-commit-msg-generator-0.1.0.vsix --force
 ```
 
 或在 VS Code 中打开「扩展」视图，点右上角 `...` → 「从 VSIX 安装…」。
