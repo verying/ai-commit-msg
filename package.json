@@ -1,0 +1,190 @@
+{
+  "name": "ai-commit-msg",
+  "displayName": "AI 提交信息生成器",
+  "description": "读取暂存的更改，调用 OpenAI 兼容接口生成提交信息并填入源代码管理输入框",
+  "version": "0.1.0",
+  "publisher": "local",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/verying/ai-commit-msg.git"
+  },
+  "engines": {
+    "vscode": "^1.90.0"
+  },
+  "categories": [
+    "Other",
+    "SCM Providers"
+  ],
+  "keywords": [
+    "commit",
+    "commit message",
+    "git",
+    "scm",
+    "ai",
+    "openai",
+    "conventional commits"
+  ],
+  "activationEvents": [],
+  "capabilities": {
+    "untrustedWorkspaces": {
+      "supported": false,
+      "description": "扩展会把暂存的代码改动发送到用户配置的第三方接口，受限模式下不启用。"
+    }
+  },
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "aiCommit.generate",
+        "title": "根据暂存的更改生成提交信息",
+        "category": "AI 提交",
+        "icon": "$(sparkle)"
+      },
+      {
+        "command": "aiCommit.setApiKey",
+        "title": "设置 AI 接口密钥",
+        "category": "AI 提交"
+      },
+      {
+        "command": "aiCommit.clearApiKey",
+        "title": "清除 AI 接口密钥",
+        "category": "AI 提交"
+      },
+      {
+        "command": "aiCommit.testConnection",
+        "title": "测试 AI 接口连接",
+        "category": "AI 提交"
+      },
+      {
+        "command": "aiCommit.showLogs",
+        "title": "显示 AI 提交日志",
+        "category": "AI 提交"
+      },
+      {
+        "command": "aiCommit.copyDiagnostics",
+        "title": "复制最近一次生成诊断",
+        "category": "AI 提交"
+      }
+    ],
+    "menus": {
+      "scm/title": [
+        {
+          "command": "aiCommit.generate",
+          "when": "scmProvider == git",
+          "group": "navigation@-100"
+        }
+      ]
+    },
+    "keybindings": [
+      {
+        "command": "aiCommit.generate",
+        "key": "ctrl+alt+shift+g",
+        "mac": "cmd+alt+shift+g"
+      }
+    ],
+    "configuration": {
+      "title": "AI 提交信息",
+      "properties": {
+        "aiCommit.baseUrl": {
+          "type": "string",
+          "default": "",
+          "order": 1,
+          "markdownDescription": "OpenAI 兼容接口地址，需包含版本前缀，例如 `https://your-relay.example.com/v1`。插件会自动追加 `/chat/completions`。"
+        },
+        "aiCommit.model": {
+          "type": "string",
+          "default": "gpt-4o-mini",
+          "order": 2,
+          "description": "模型名称，由中转站实际支持的模型决定。"
+        },
+        "aiCommit.language": {
+          "type": "string",
+          "enum": [
+            "zh-CN",
+            "en",
+            "auto"
+          ],
+          "enumDescriptions": [
+            "简体中文",
+            "英文",
+            "根据 diff 内容自动判断"
+          ],
+          "default": "zh-CN",
+          "order": 3,
+          "description": "提交信息语言。"
+        },
+        "aiCommit.style": {
+          "type": "string",
+          "enum": [
+            "conventional",
+            "plain"
+          ],
+          "enumDescriptions": [
+            "Conventional Commits（type(scope): subject）",
+            "普通描述"
+          ],
+          "default": "conventional",
+          "order": 4,
+          "description": "提交信息风格。"
+        },
+        "aiCommit.maxDiffChars": {
+          "type": "number",
+          "default": 120000,
+          "minimum": 2000,
+          "order": 5,
+          "description": "发送给模型的 diff 最大字符数，超出后按文件截断。"
+        },
+        "aiCommit.requestTimeoutMs": {
+          "type": "number",
+          "default": 60000,
+          "minimum": 5000,
+          "order": 6,
+          "description": "单次请求超时时间（毫秒）。"
+        },
+        "aiCommit.temperature": {
+          "type": "number",
+          "default": 0.2,
+          "minimum": 0,
+          "maximum": 1,
+          "order": 7,
+          "description": "采样温度。"
+        },
+        "aiCommit.maxTokens": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "maximum": 8192,
+          "order": 8,
+          "markdownDescription": "返回内容的最大 token 数。**0 表示不发送 `max_tokens`**，由接口默认上限决定（推荐，Trae 的提交信息生成也由服务端决定上限）。设为正数会显式限制，过小会导致提交信息被截断。"
+        },
+        "aiCommit.stream": {
+          "type": "boolean",
+          "default": true,
+          "order": 9,
+          "description": "是否使用流式返回。中转站不支持流式时关闭。"
+        },
+        "aiCommit.extraInstructions": {
+          "type": "string",
+          "default": "",
+          "order": 10,
+          "markdownDescription": "附加到系统提示词的额外要求，例如 `使用英文、不要生成 body`。"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "npm run compile && node --test \"out/test/*.test.js\"",
+    "test:e2e": "npm run compile && node out/test/e2e/runTest.js",
+    "package": "npm run compile && vsce package --no-dependencies"
+  },
+  "devDependencies": {
+    "@types/node": "^20.17.0",
+    "@types/vscode": "^1.90.0",
+    "@vscode/test-electron": "^2.5.2",
+    "@vscode/vsce": "^3.2.0",
+    "typescript": "^5.6.0"
+  }
+}

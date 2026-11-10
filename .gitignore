@@ -1,0 +1,21 @@
+# 依赖与构建产物
+node_modules/
+out/
+*.tsbuildinfo
+
+# 打包产物（所有历史 vsix 都不入库）
+*.vsix
+
+# 端到端测试缓存（扩展宿主 user-data、下载的扩展等）
+.vscode-test/
+
+# 日志与系统临时文件
+*.log
+npm-debug.log*
+yarn-error.log*
+.DS_Store
+Thumbs.db
+
+# 本地环境变量，避免误提交密钥
+.env
+.env.*
