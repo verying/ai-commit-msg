@@ -34,10 +34,6 @@
 - 命令面板与快捷键不再限制 `scmProvider == git`，非 Git 窗口里也能触发并看到友好提示。
 - 新增 `git.ts` 单元测试：多仓库选择、首次提交无 HEAD、`repo.diff` 失败回落 CLI、虚拟工作区报错。
 
-### 发布前待办（需要人工提供）
-
-- `package.json` 的 `publisher` 目前为占位值 `local`，需替换为 Marketplace 已注册的发布者 ID。
-
 ## 0.0.5
 
 - 停掉流式写入，改为生成结束后一次性写入；新增真实 VS Code 端到端验证。

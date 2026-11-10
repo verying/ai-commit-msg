@@ -3,7 +3,7 @@
   "displayName": "AI 提交信息生成器",
   "description": "读取暂存的更改，调用 OpenAI 兼容接口生成提交信息并填入源代码管理输入框",
   "version": "0.1.0",
-  "publisher": "local",
+  "publisher": "verying",
   "license": "MIT",
   "repository": {
     "type": "git",

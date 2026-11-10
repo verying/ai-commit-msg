@@ -141,11 +141,6 @@ npm run package          # 打包 vsix
 
 e2e 会复用本机已安装的 VS Code：优先读取环境变量 `VSCODE_EXE`，未设置时按各平台常见安装位置查找（Windows 的用户级与全局安装目录、macOS 的 `/Applications`、Linux 的 `/usr/share/code`）。它会在临时目录建一个 git 仓库、暂存文件、执行生成命令并读回真实 SCM 输入框的值。若装在自定义路径，请先设置 `VSCODE_EXE`。
 
-## 发布前待办
-
-- `package.json` 中的 `publisher` 目前是占位值 `local`，发布前需替换为 Marketplace 已注册的发布者 ID（个人开发者用一个自建的 publisher 即可）。
-- 详见 [CHANGELOG.md](./CHANGELOG.md)。
-
 ## 许可证
 
 [MIT](./LICENSE)
