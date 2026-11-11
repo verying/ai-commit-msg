@@ -41,11 +41,11 @@ npm run package
 | 配置 | 默认值 | 说明 |
 | --- | --- | --- |
 | `aiCommit.baseUrl` | 空 | OpenAI 兼容接口地址，需包含版本前缀，如 `https://host/v1` |
-| `aiCommit.model` | `gpt-4o-mini` | 模型名称，由中转站实际支持情况决定 |
+| `aiCommit.model` | `gpt-4o-mini` | 模型名称；这是占位默认值，多数中转站并不提供同名模型，可用「选择模型」命令从 `/v1/models` 拉取后挑选 |
 | `aiCommit.language` | `zh-CN` | `zh-CN` / `en` / `auto`（按 diff 内容判断） |
 | `aiCommit.style` | `conventional` | `conventional`（`type(scope): subject`）或 `plain` |
 | `aiCommit.maxDiffChars` | `120000` | 发送给模型的 diff 上限，超出按文件截断 |
-| `aiCommit.requestTimeoutMs` | `60000` | 单次请求超时（毫秒） |
+| `aiCommit.requestTimeoutMs` | `60000` | 单次请求整体超时（毫秒），建立连接另有 10 秒上限 |
 | `aiCommit.temperature` | `0.2` | 采样温度，0–1 |
 | `aiCommit.maxTokens` | `0` | 返回 token 上限；**0 表示不发送该字段**，由接口默认上限决定 |
 | `aiCommit.stream` | `true` | 是否使用流式返回；中转站不支持流式时关闭 |
@@ -63,6 +63,22 @@ npm run package
 | `AI 提交: 测试 AI 接口连接` | 发送一次最小请求验证地址、模型与密钥 |
 | `AI 提交: 显示 AI 提交日志` | 打开「AI 提交」输出通道 |
 | `AI 提交: 复制最近一次生成诊断` | 把最近一次生成的诊断文本复制到剪贴板 |
+| `AI 提交: 选择模型（从 /v1/models 拉取）` | 调用接口的 `/v1/models`，在快速选择里挑模型并写入 `aiCommit.model` |
+
+## 网络与代理
+
+扩展发请求时与 VS Code 使用同一套代理配置：
+
+1. 优先读 `http.proxy`（`direct` 表示强制直连，`socks://` / pac 暂不支持，会退回环境变量）；
+2. `http.proxySupport` 为 `off` 时一律直连；
+3. 未配置 `http.proxy` 时读 `HTTPS_PROXY` / `HTTP_PROXY`（http 目标读 `HTTP_PROXY`）；
+4. 命中 `NO_PROXY`（支持 `*`、`example.com`、`.example.com`、`*.example.com`、`host:port`，不支持 CIDR）时直连。
+
+代理地址形如 `http://user:pass@127.0.0.1:7890`，密码里的 `@`、`:` 等特殊字符需要 URL 编码；日志与错误提示中的密码会被打码为 `***`。
+
+连接阶段对 `EAI_AGAIN`、`ECONNRESET`、`ECONNREFUSED`、`UND_ERR_CONNECT_TIMEOUT`、`UND_ERR_SOCKET`、`ETIMEDOUT` 和 HTTP 5xx 做最多 2 次指数退避重试；**只在还没收到任何内容时重试**，流式已经开始输出就不会重发，避免提交信息重复。
+
+「AI 提交」输出通道里每次请求都会记录：目标主机、是否走代理及来源、整体超时与连接超时、第几次尝试、失败时的完整 `cause` 链（`code` / `errno` / `syscall` / `hostname`）。失败提示会按错误码给出中文原因与建议，例如 `ENOTFOUND`（域名解析失败）、`ECONNREFUSED`（端口无人监听/代理未启动）、`UND_ERR_CONNECT_TIMEOUT`（连接超时）、`CERT_HAS_EXPIRED`（证书过期）。
 
 ## 行为说明
 

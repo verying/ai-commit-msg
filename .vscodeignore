@@ -1,9 +1,12 @@
 .vscode/**
 .gitignore
-node_modules/**
 src/**
 out/test/**
 .vscode-test/**
 tsconfig.json
 **/*.map
 *.vsix
+# 运行时只需要 undici 的 lib/，类型声明与文档不进包
+node_modules/undici/types/**
+node_modules/undici/docs/**
+node_modules/undici/scripts/**

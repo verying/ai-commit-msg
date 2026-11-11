@@ -2,7 +2,7 @@
   "name": "ai-commit-msg-generator",
   "displayName": "AI 提交信息生成器",
   "description": "读取暂存的更改，调用 OpenAI 兼容接口生成提交信息并填入源代码管理输入框",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "publisher": "verying",
   "license": "MIT",
   "repository": {
@@ -64,6 +64,11 @@
       {
         "command": "aiCommit.copyDiagnostics",
         "title": "复制最近一次生成诊断",
+        "category": "AI 提交"
+      },
+      {
+        "command": "aiCommit.selectModel",
+        "title": "选择模型（从 /v1/models 拉取）",
         "category": "AI 提交"
       }
     ],
@@ -178,7 +183,7 @@
     "watch": "tsc -watch -p ./",
     "test": "npm run compile && node --test \"out/test/*.test.js\"",
     "test:e2e": "npm run compile && node out/test/e2e/runTest.js",
-    "package": "npm run compile && vsce package --no-dependencies"
+    "package": "npm run compile && vsce package"
   },
   "devDependencies": {
     "@types/node": "^20.17.0",
@@ -186,5 +191,8 @@
     "@vscode/test-electron": "^2.5.2",
     "@vscode/vsce": "^3.2.0",
     "typescript": "^5.6.0"
+  },
+  "dependencies": {
+    "undici": "^6.29.1"
   }
 }

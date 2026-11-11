@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.1.1
+
+针对「时好时坏的 `fetch failed`」做连接层加固。
+
+### 新增
+
+- 代理支持：按 VS Code 的 `http.proxy` / `http.proxySupport` 与 `HTTPS_PROXY`、`HTTP_PROXY`、`NO_PROXY` 决定是否走代理（socks/pac 暂不支持，会退回环境变量）。
+- 连接阶段重试：`EAI_AGAIN`、`ECONNRESET`、`ECONNREFUSED`、`UND_ERR_CONNECT_TIMEOUT`、`UND_ERR_SOCKET`、`ETIMEDOUT` 及 HTTP 5xx 最多重试 2 次（指数退避），仅在尚未收到任何内容时重试。
+- 新增命令「AI 提交: 选择模型（从 /v1/models 拉取）」，可直接从接口列出的模型中挑选并写入 `aiCommit.model`。
+- 网络错误细分：按 `error.cause` 里的 `code` 给出中文原因与排查建议（DNS、连接拒绝、超时、证书等）。
+- 日志新增：目标主机、代理来源、整体/连接超时、第几次尝试、完整 `cause` 链（`code`/`errno`/`syscall`/`hostname`）。
+
+### 修复
+
+- 模型不存在时不再误报为网络问题，改为提示模型不可用并引导选择可用模型。
+- 请求改用自带 undici `Agent`（`autoSelectFamily` 开启），减少 IPv6-only 解析与连接池复用旧连接导致的间歇失败；每次请求独立连接，用完即关。
+- `baseUrl` 归一化规则明确：末尾斜杠、`/v1`、`/v1/chat/completions`、纯域名均能正确拼出请求地址。
+- 代理地址非法（缺协议头、特殊字符未编码）时提示「代理地址无法使用」并按配置错误处理，不再抛原始英文异常。
+- 代理地址里的账号密码在日志与错误提示中打码（`user:***@host`），避免反馈问题时泄露凭据。
+- `NO_PROXY` 补齐 `*.example.com`、`example.com:8080`、IPv6 条目；CIDR 写法不再被误判为命中。
+- 生成期间再次点击生成会被直接挡下，避免两次请求并发写同一个提交信息输入框；退避等待中取消/超时会立即结束，不再多发一次请求。
+- 接口返回非 JSON（例如被网关/代理换成 HTML 错误页）时提示「返回的不是 JSON」，不再归类成网络错误。
+
+### 依赖
+
+- 新增运行时依赖 `undici`（Node 官方 HTTP 客户端，零传递依赖），用于提供代理 dispatcher 与连接参数控制；同时取消打包时的 `--no-dependencies`。
+- `undici` 选用 6.x（要求 Node ≥ 18.17），与扩展声明的最低 VS Code 1.90（Node 20.9）兼容；7.x 要求 Node ≥ 20.18.1，会让旧版 VS Code 装上后无法联网。
+
 ## 0.1.0
 
 对外首发版本。相对 0.0.5 的主要变化是发布合规与健壮性，功能行为不变。
